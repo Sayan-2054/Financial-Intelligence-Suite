@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react'
-import Dashboard from '../components/Dashboard.jsx'
+import Dashboard from './components/Dashboard.jsx'
 
 export default function App() {
   const [input, setInput]   = useState('AAPL')

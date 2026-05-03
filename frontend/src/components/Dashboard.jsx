@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import { useAnalysis }                    from '../hooks/useAnalysis.js'
 import { formatPrice, formatBigNum, fmtDate } from '../utils/formatters.js'
-import ChatBot                             from './ChatBot.jsx'
+import ChatBot                             from './Chatbot.jsx'
 
 // ── Atoms ─────────────────────────────────────────────────────────────────
 
