@@ -220,8 +220,9 @@ function Card({ title, children, span }) {
 // ── Main Dashboard ─────────────────────────────────────────────────────────
 
 export default function Dashboard({ ticker }) {
-  const { data, loading, error } = useAnalysis(ticker)
-  const [chatOpen, setChatOpen]  = useState(false)
+  const [period,    setPeriod]    = useState('6mo')
+  const { data, loading, error }  = useAnalysis(ticker, period)
+  const [chatOpen,  setChatOpen]  = useState(false)
 
   const ind      = data?.indicators ?? {}
   const forecast = data?.forecast   ?? {}
@@ -304,6 +305,42 @@ export default function Dashboard({ ticker }) {
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
 
               <Card title="Price History + 7-Day ML Forecast" span>
+                {/* Timeframe Picker */}
+                <div style={{ display: 'flex', gap: 6, marginBottom: 16, flexWrap: 'wrap' }}>
+                  {[
+                    { label: '1D',   value: '1d'  },
+                    { label: '1W',   value: '5d'  },
+                    { label: '1M',   value: '1mo' },
+                    { label: '6M',   value: '6mo' },
+                    { label: '1Y',   value: '1y'  },
+                    { label: '5Y',   value: '5y'  },
+                    { label: 'All',  value: 'max' },
+                  ].map(tf => (
+                    <button
+                      key={tf.value}
+                      onClick={() => setPeriod(tf.value)}
+                      style={{
+                        padding: '4px 12px', borderRadius: 'var(--radius-sm)',
+                        background: period === tf.value ? 'var(--accent-cyan)' : 'var(--bg-elevated)',
+                        color:      period === tf.value ? '#080c12' : 'var(--text-secondary)',
+                        border: '1px solid ' + (period === tf.value ? 'var(--accent-cyan)' : 'var(--border-subtle)'),
+                        cursor: 'pointer', fontFamily: 'var(--font-display)', fontWeight: 600,
+                        fontSize: 11, letterSpacing: '0.06em', transition: 'all 0.15s',
+                      }}
+                    >
+                      {tf.label}
+                    </button>
+                  ))}
+                  {loading && (
+                    <span style={{
+                      display: 'inline-block', width: 14, height: 14, marginLeft: 4,
+                      border: '2px solid var(--border-default)',
+                      borderTopColor: 'var(--accent-cyan)',
+                      borderRadius: '50%', animation: 'spin 0.75s linear infinite',
+                      alignSelf: 'center',
+                    }} />
+                  )}
+                </div>
                 <PriceChart historical={data.historical_prices} forecast={forecast} currency={data.currency} />
               </Card>
 

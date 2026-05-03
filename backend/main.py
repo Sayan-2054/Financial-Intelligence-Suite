@@ -45,7 +45,7 @@ app.add_middleware(
     allow_origins=[
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://financial-intelligence-suite-seven.vercel.app",  # ← your Vercel URL
+        "https://financial-intelligence-suite.vercel.app",  # ← your Vercel URL
         "https://*.vercel.app",  # ← covers all preview deployments too
     ],
     allow_credentials=True,
@@ -169,16 +169,24 @@ async def ollama_status():
 
 
 @app.get("/get-analysis/{ticker}", tags=["Analysis"])
-async def get_analysis(ticker: str):
+async def get_analysis(ticker: str, period: str = "2y"):
     ticker = validate_ticker(ticker)
 
+    # Validate period
+    VALID_PERIODS = {"1d","5d","1mo","3mo","6mo","1y","2y","5y","10y","ytd","max"}
+    if period not in VALID_PERIODS:
+        period = "2y"
+
+    cache_key = f"{ticker}:{period}"
     now = time.time()
-    if ticker in _cache and now - _cache[ticker][0] < CACHE_TTL:
-        d = dict(_cache[ticker][1]); d["cached"] = True
+    if cache_key in _cache and now - _cache[cache_key][0] < CACHE_TTL:
+        d = dict(_cache[cache_key][1]); d["cached"] = True
         return d
 
     try:
-        result = await asyncio.wait_for(run(_engine.analyze, ticker), timeout=60.0)
+        result = await asyncio.wait_for(
+            run(_engine.analyze, ticker, period), timeout=60.0
+        )
     except asyncio.TimeoutError:
         raise HTTPException(504, f"Analysis timed out for '{ticker}'.")
 
@@ -187,7 +195,7 @@ async def get_analysis(ticker: str):
 
     d = to_dict(result)
     d["cached"] = False
-    _cache[ticker] = (now, d)
+    _cache[cache_key] = (now, d)
     return d
 
 

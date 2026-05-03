@@ -36,7 +36,7 @@ async function request(path, options = {}) {
   }
 }
 
-export const fetchAnalysis       = (ticker) => request(`/get-analysis/${encodeURIComponent(ticker)}`)
+export const fetchAnalysis       = (ticker, period = '2y') => request(`/get-analysis/${encodeURIComponent(ticker)}?period=${period}`)
 export const fetchRecommendations = ()       => request('/get-recommendations')
 export const sendChat            = (body)   => request('/chat', { method: 'POST', body: JSON.stringify(body) })
 export const clearSession        = (sid)    => request(`/chat/session/${encodeURIComponent(sid)}`, { method: 'DELETE' })

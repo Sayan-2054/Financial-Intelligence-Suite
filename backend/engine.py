@@ -208,12 +208,12 @@ class FinancialEngine:
         self._predictor  = RandomForestPredictor()
         self._signal_gen = SignalGenerator()
 
-    def analyze(self, ticker: str) -> AnalysisResult:
+    def analyze(self, ticker: str, period: str = "2y") -> AnalysisResult:
         ticker = ticker.upper().strip()
-        logger.info("Analyzing %s", ticker)
+        logger.info("Analyzing %s period=%s", ticker, period)
 
         try:
-            df, info = self._fetch(ticker)
+            df, info = self._fetch(ticker, period)
         except Exception as exc:
             logger.error("Fetch failed for %s: %s", ticker, exc)
             return self._error_result(ticker, str(exc))
@@ -241,19 +241,36 @@ class FinancialEngine:
     # Private
     # ------------------------------------------------------------------
 
-    def _fetch(self, ticker: str) -> tuple[pd.DataFrame, dict]:
+    @staticmethod
+    def _interval(period: str) -> str:
+        """Pick the best yfinance interval for a given period."""
+        return {
+            "1d":  "1m",
+            "5d":  "5m",
+            "1mo": "1h",
+            "3mo": "1d",
+            "6mo": "1d",
+            "1y":  "1d",
+            "2y":  "1d",
+            "5y":  "1wk",
+            "10y": "1wk",
+            "ytd": "1d",
+            "max": "1mo",
+        }.get(period, "1d")
+
+    def _fetch(self, ticker: str, period: str = "2y") -> tuple[pd.DataFrame, dict]:
         """
         Fetch OHLCV via yfinance >= 1.3.0.
-        Do NOT pass session= — yfinance now uses curl_cffi internally
-        and will raise an error if given a requests.Session.
+        Do NOT pass session= — yfinance now uses curl_cffi internally.
         """
-        stock = yf.Ticker(ticker)
-        df    = stock.history(period="2y", interval="1d", auto_adjust=True)
+        interval = self._interval(period)
+        stock    = yf.Ticker(ticker)
+        df       = stock.history(period=period, interval=interval, auto_adjust=True)
 
         if df.empty:
             logger.warning("%s: history() empty, trying download()", ticker)
             df = yf.download(
-                ticker, period="2y", interval="1d",
+                ticker, period=period, interval=interval,
                 auto_adjust=True, progress=False,
             )
 

@@ -1,5 +1,4 @@
 import { useState, useCallback } from 'react'
-import MarqueeBar  from './components/MarqueeBar.jsx'
 import SearchBar   from './components/SearchBar.jsx'
 import HomePage    from './components/HomePage.jsx'
 import Dashboard   from './components/Dashboard.jsx'
@@ -97,9 +96,6 @@ export default function App() {
           </button>
         </div>
       </header>
-
-      {/* ── Marquee ── */}
-      <MarqueeBar />
 
       {/* ── Page Content ── */}
       {ticker ? (
