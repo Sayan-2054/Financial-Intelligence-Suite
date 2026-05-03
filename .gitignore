@@ -1,0 +1,20 @@
+# ── Secrets ───────────────────────────────
+backend/.env
+
+# ── Python ────────────────────────────────
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+
+# ── Node ──────────────────────────────────
+frontend/node_modules/
+frontend/dist/
+frontend/.env.local
+frontend/.env.production
+
+# ── OS ────────────────────────────────────
+.DS_Store
+Thumbs.db
