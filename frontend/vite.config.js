@@ -12,4 +12,15 @@ export default defineConfig({
       '/health': 'http://localhost:8000',
     },
   },
+  build: {
+    chunkSizeWarningLimit: 600,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'react-vendor':    ['react', 'react-dom'],
+          'charts-vendor':   ['recharts'],
+        },
+      },
+    },
+  },
 })
