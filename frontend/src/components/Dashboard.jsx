@@ -5,7 +5,7 @@ import {
 } from 'recharts'
 import { useAnalysis }                    from '../hooks/useAnalysis.js'
 import { formatPrice, formatBigNum, fmtDate } from '../utils/formatters.js'
-import ChatBot                             from './Chatbot.jsx'
+import ChatBot                             from './ChatBot.jsx'
 
 // ── Atoms ─────────────────────────────────────────────────────────────────
 
@@ -489,6 +489,45 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
           </div>
         )}
       </main>
+
+      {/* ── Footer ── */}
+      <footer style={{
+        borderTop: '1px solid var(--border-subtle)',
+        padding: '20px 32px',
+        display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+        flexWrap: 'wrap', gap: 10,
+        background: 'var(--bg-deep)',
+      }}>
+        <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{
+            width: 28, height: 28, borderRadius: 6,
+            background: 'var(--accent-cyan)', color: '#080c12',
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 13,
+          }}>Φ</div>
+          <div>
+            <p style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13, color: 'var(--text-primary)' }}>
+              Financial Intelligence Suite
+            </p>
+            <p style={{ fontSize: 10, color: 'var(--text-muted)' }}>
+              Developed by <span style={{ color: 'var(--accent-cyan)' }}>Sayantan Chowdhury</span>
+            </p>
+          </div>
+        </div>
+
+        <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
+          <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
+            Powered by <span style={{ color: 'var(--text-secondary)' }}>Ollama</span> · <span style={{ color: 'var(--text-secondary)' }}>FastAPI</span> · <span style={{ color: 'var(--text-secondary)' }}>React</span>
+          </span>
+          <span style={{
+            fontSize: 10, padding: '3px 10px', borderRadius: 20,
+            background: 'var(--signal-sell-dim)', color: 'var(--signal-sell)',
+            border: '1px solid rgba(239,68,68,0.2)',
+          }}>
+            ⚠ Not Financial Advice
+          </span>
+        </div>
+      </footer>
 
       {/* ── Chat FAB ── */}
       <button
