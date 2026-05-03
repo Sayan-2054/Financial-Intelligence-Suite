@@ -221,7 +221,7 @@ function Card({ title, children, span }) {
 
 export default function Dashboard({ ticker }) {
   const [period,    setPeriod]    = useState('6mo')
-  const { data, loading, error }  = useAnalysis(ticker, period)
+  const { data, loading, error, retry } = useAnalysis(ticker, period)
   const [chatOpen,  setChatOpen]  = useState(false)
 
   const ind      = data?.indicators ?? {}
@@ -236,22 +236,52 @@ export default function Dashboard({ ticker }) {
         {error && (
           <div style={{
             background: 'var(--signal-sell-dim)', border: '1px solid var(--signal-sell)',
-            borderRadius: 'var(--radius-md)', padding: '12px 18px', marginBottom: 24,
-            color: 'var(--signal-sell)', fontFamily: 'var(--font-mono)',
+            borderRadius: 'var(--radius-md)', padding: '16px 20px', marginBottom: 24,
+            display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', gap: 16,
           }}>
-            ⚠ {error}
+            <div>
+              <p style={{ color: 'var(--signal-sell)', fontFamily: 'var(--font-mono)', fontSize: 13, marginBottom: 6 }}>
+                ⚠ {error}
+              </p>
+              <p style={{ color: 'var(--text-muted)', fontSize: 11, lineHeight: 1.6 }}>
+                The backend may be waking up (Render free tier cold start takes ~30s).
+                The request will retry automatically. You can also click Retry.
+              </p>
+            </div>
+            <button
+              onClick={retry}
+              style={{
+                flexShrink: 0, padding: '8px 18px', borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-elevated)', border: '1px solid var(--signal-sell)',
+                color: 'var(--signal-sell)', cursor: 'pointer', fontFamily: 'var(--font-display)',
+                fontWeight: 700, fontSize: 12, letterSpacing: '0.05em', whiteSpace: 'nowrap',
+              }}
+            >
+              ↺ Retry
+            </button>
           </div>
         )}
 
         {loading && !data && (
           <div style={{ textAlign: 'center', padding: '80px 0', color: 'var(--text-muted)' }}>
-            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 16 }}><Spinner /></div>
-            <p style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.1em' }}>
-              FETCHING MARKET DATA FOR {ticker}…
+            <div style={{ display: 'flex', justifyContent: 'center', marginBottom: 20 }}>
+              <Spinner />
+            </div>
+            <p style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.1em', fontSize: 15, color: 'var(--text-primary)', marginBottom: 10 }}>
+              Fetching analysis for {ticker}…
             </p>
-            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
-              First load may take 30–60s on free tier
+            <p style={{ fontSize: 12, color: 'var(--text-muted)', marginBottom: 6 }}>
+              Auto-retrying if backend is slow · ML model runs on first request
             </p>
+            <div style={{
+              display: 'inline-flex', alignItems: 'center', gap: 8, marginTop: 8,
+              padding: '6px 14px', borderRadius: 20,
+              background: 'rgba(34,211,238,0.06)', border: '1px solid rgba(34,211,238,0.15)',
+            }}>
+              <span style={{ fontSize: 11, color: 'var(--text-muted)', fontFamily: 'var(--font-mono)' }}>
+                First load on free tier: ~30–60s · subsequent loads: ~5–10s
+              </span>
+            </div>
           </div>
         )}
 

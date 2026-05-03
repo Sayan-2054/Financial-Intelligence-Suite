@@ -1,10 +1,13 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { fetchAnalysis } from '../api/client.js'
 
-export function useAnalysis(ticker, period = '2y') {
+export function useAnalysis(ticker, period = '6mo') {
   const [data,    setData]    = useState(null)
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState(null)
+  const [retryKey, setRetryKey] = useState(0)
+
+  const retry = useCallback(() => setRetryKey(k => k + 1), [])
 
   useEffect(() => {
     if (!ticker) return
@@ -20,7 +23,7 @@ export function useAnalysis(ticker, period = '2y') {
       .finally(()=> { if (!cancelled)  setLoading(false) })
 
     return () => { cancelled = true }
-  }, [ticker, period])
+  }, [ticker, period, retryKey])
 
-  return { data, loading, error }
+  return { data, loading, error, retry }
 }
