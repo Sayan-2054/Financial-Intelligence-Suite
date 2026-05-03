@@ -42,13 +42,8 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://financial-intelligence-suite.vercel.app",  # ← your Vercel URL
-        "https://*.vercel.app",  # ← covers all preview deployments too
-    ],
-    allow_credentials=True,
+    allow_origins=["*"],   # tighten to your Vercel domain after confirming it works
+    allow_credentials=False,
     allow_methods=["*"],
     allow_headers=["*"],
 )
