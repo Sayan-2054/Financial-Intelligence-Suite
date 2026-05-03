@@ -147,7 +147,7 @@ function ChartTip({ active, payload, label }) {
 // ── Price Chart ────────────────────────────────────────────────────────────
 
 function PriceChart({ historical = [], forecast = {}, currency = 'USD' }) {
-  const sym = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[currency] ?? `${currency} `
+  const sym = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[currency] ??  currency + ' '
 
   const hist  = historical.slice(-90).map(d => ({ date: fmtDate(d.date), close: d.close }))
   const fcast = (forecast.dates ?? []).map((date, i) => ({
