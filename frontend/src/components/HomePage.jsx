@@ -447,7 +447,7 @@ export default function HomePage({ onSelectTicker, recentlyViewed }) {
       )}
     </div>
   )
-}
+
 
 // ── Section Header ─────────────────────────────────────────────────────────
 
