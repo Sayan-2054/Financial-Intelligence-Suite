@@ -3,20 +3,19 @@ import {
   AreaChart, Area, XAxis, YAxis,
   CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine,
 } from 'recharts'
-import { useAnalysis }                    from '../hooks/useAnalysis.js'
-import { formatPrice, formatBigNum, fmtDate } from '../utils/formatters.js'
-import ChatBot                             from './Chatbot.jsx'
+import { useAnalysis }                         from '../hooks/useAnalysis.js'
+import { formatPrice, formatBigNum, fmtDate }  from '../utils/formatters.js'
+import ChatBot                                  from './ChatBot.jsx'
 
-// ── Atoms ─────────────────────────────────────────────────────────────────
+// ── Atoms ──────────────────────────────────────────────────────────────────
 
 function Spinner() {
   return (
     <span style={{
-      display: 'inline-block', width: 18, height: 18,
+      display: 'inline-block', width: 20, height: 20,
       border: '2px solid var(--border-default)',
       borderTopColor: 'var(--accent-cyan)',
-      borderRadius: '50%',
-      animation: 'spin 0.75s linear infinite',
+      borderRadius: '50%', animation: 'spin 0.75s linear infinite',
     }} />
   )
 }
@@ -33,7 +32,7 @@ function Tag({ children, color }) {
   )
 }
 
-// ── Signal Badge ──────────────────────────────────────────────────────────
+// ── Signal ─────────────────────────────────────────────────────────────────
 
 const SIGNAL_CFG = {
   BUY:  { color: 'var(--signal-buy)',  bg: 'var(--signal-buy-dim)',  icon: '▲', label: 'BUY' },
@@ -47,8 +46,7 @@ function SignalBadge({ signal, strength }) {
     <div style={{
       display: 'inline-flex', alignItems: 'center', gap: 8,
       padding: '8px 18px', borderRadius: 'var(--radius-md)',
-      background: cfg.bg, border: `1px solid ${cfg.color}`,
-      color: cfg.color,
+      background: cfg.bg, border: `1px solid ${cfg.color}`, color: cfg.color,
     }}>
       <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 18, letterSpacing: '0.05em' }}>
         {cfg.icon} {cfg.label}
@@ -60,19 +58,15 @@ function SignalBadge({ signal, strength }) {
   )
 }
 
-// ── Sentiment Meter SVG ───────────────────────────────────────────────────
+// ── Sentiment Meter ────────────────────────────────────────────────────────
 
 function SentimentMeter({ strength = 50, signal = 'HOLD' }) {
-  const angle = (strength / 100) * 180 - 90
-  const color = SIGNAL_CFG[signal]?.color ?? 'var(--signal-hold)'
-  // Arc progress (circumference of a 80r half-circle ≈ 251.2)
+  const angle  = (strength / 100) * 180 - 90
+  const color  = SIGNAL_CFG[signal]?.color ?? 'var(--signal-hold)'
   const arcLen = (strength / 100) * 251.2
-
   return (
     <div style={{ textAlign: 'center' }}>
-      <p style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6, letterSpacing: '0.1em' }}>
-        SENTIMENT METER
-      </p>
+      <p style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6, letterSpacing: '0.1em' }}>SENTIMENT METER</p>
       <svg viewBox="0 0 200 110" style={{ width: '100%', maxWidth: 190 }}>
         <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke="var(--bg-hover)" strokeWidth="14" strokeLinecap="round" />
         <path d="M 20 100 A 80 80 0 0 1 180 100" fill="none" stroke={color}
@@ -94,7 +88,7 @@ function SentimentMeter({ strength = 50, signal = 'HOLD' }) {
   )
 }
 
-// ── Metric Card ───────────────────────────────────────────────────────────
+// ── Metric Card ────────────────────────────────────────────────────────────
 
 function MetricCard({ label, value, sub, accent }) {
   return (
@@ -113,7 +107,7 @@ function MetricCard({ label, value, sub, accent }) {
   )
 }
 
-// ── Indicator Row ─────────────────────────────────────────────────────────
+// ── Indicator Row ──────────────────────────────────────────────────────────
 
 function IndRow({ label, value, status }) {
   const statusColor = { bullish: 'var(--signal-buy)', bearish: 'var(--signal-sell)', neutral: 'var(--text-muted)' }[status] ?? 'var(--text-muted)'
@@ -131,7 +125,7 @@ function IndRow({ label, value, status }) {
   )
 }
 
-// ── Custom Recharts Tooltip ───────────────────────────────────────────────
+// ── Chart Tooltip ──────────────────────────────────────────────────────────
 
 function ChartTip({ active, payload, label }) {
   if (!active || !payload?.length) return null
@@ -150,20 +144,19 @@ function ChartTip({ active, payload, label }) {
   )
 }
 
-// ── Price Chart ───────────────────────────────────────────────────────────
+// ── Price Chart ────────────────────────────────────────────────────────────
 
 function PriceChart({ historical = [], forecast = {}, currency = 'USD' }) {
-  const sym = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[currency] ?? currency + ' '
-  const hist = historical.slice(-90).map(d => ({
-    date: fmtDate(d.date), close: d.close,
-  }))
+  const sym = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[currency] ?? `${currency} `
+
+  const hist  = historical.slice(-90).map(d => ({ date: fmtDate(d.date), close: d.close }))
   const fcast = (forecast.dates ?? []).map((date, i) => ({
     date: fmtDate(date),
     forecast: forecast.predicted_prices?.[i],
     upper:    forecast.confidence_band_upper?.[i],
     lower:    forecast.confidence_band_lower?.[i],
   }))
-  const combined = [...hist, ...fcast]
+  const combined  = [...hist, ...fcast]
   const splitDate = hist[hist.length - 1]?.date
 
   return (
@@ -184,66 +177,23 @@ function PriceChart({ historical = [], forecast = {}, currency = 'USD' }) {
           tickLine={false} axisLine={false} interval="preserveStartEnd" />
         <YAxis tick={{ fill: 'var(--text-muted)', fontSize: 10 }}
           tickLine={false} axisLine={false}
-          tickFormatter={v => `${sym}${v.toFixed(0)}`} width={58}
+          tickFormatter={v => `${sym}${v.toFixed(0)}`} width={62}
           domain={['auto', 'auto']} />
         <Tooltip content={<ChartTip />} />
         {splitDate && (
           <ReferenceLine x={splitDate} stroke="var(--text-muted)" strokeDasharray="4 4"
             label={{ value: 'NOW', fill: 'var(--text-muted)', fontSize: 9, position: 'top' }} />
         )}
-        <Area type="monotone" dataKey="close"    name="Close"    stroke="var(--chart-price)"    fill="url(#gPrice)"    strokeWidth={2}   dot={false} />
-        <Area type="monotone" dataKey="forecast" name="Forecast" stroke="var(--chart-forecast)" fill="url(#gForecast)" strokeWidth={2}   dot={false} strokeDasharray="5 3" />
-        <Area type="monotone" dataKey="upper"    name="Upper"    stroke="var(--chart-forecast)" fill="none"            strokeWidth={1}   dot={false} strokeDasharray="2 4" opacity={0.45} />
-        <Area type="monotone" dataKey="lower"    name="Lower"    stroke="var(--chart-forecast)" fill="none"            strokeWidth={1}   dot={false} strokeDasharray="2 4" opacity={0.45} />
+        <Area type="monotone" dataKey="close"    name="Close"    stroke="var(--chart-price)"    fill="url(#gPrice)"    strokeWidth={2} dot={false} />
+        <Area type="monotone" dataKey="forecast" name="Forecast" stroke="var(--chart-forecast)" fill="url(#gForecast)" strokeWidth={2} dot={false} strokeDasharray="5 3" />
+        <Area type="monotone" dataKey="upper"    name="Upper"    stroke="var(--chart-forecast)" fill="none"            strokeWidth={1} dot={false} strokeDasharray="2 4" opacity={0.45} />
+        <Area type="monotone" dataKey="lower"    name="Lower"    stroke="var(--chart-forecast)" fill="none"            strokeWidth={1} dot={false} strokeDasharray="2 4" opacity={0.45} />
       </AreaChart>
     </ResponsiveContainer>
   )
 }
 
-// ── Search Bar ────────────────────────────────────────────────────────────
-
-function SearchBar({ value, onChange, onSearch, loading }) {
-  return (
-    <div style={{ display: 'flex', gap: 8, alignItems: 'center' }}>
-      <div style={{
-        display: 'flex', alignItems: 'center',
-        background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
-        borderRadius: 'var(--radius-md)', overflow: 'hidden', flex: 1, maxWidth: 300,
-        boxShadow: 'var(--shadow-glow-cyan)',
-      }}>
-        <span style={{ padding: '0 12px', color: 'var(--text-muted)', fontSize: 15, userSelect: 'none' }}>⌕</span>
-        <input
-          value={value}
-          onChange={e => onChange(e.target.value.toUpperCase())}
-          onKeyDown={e => e.key === 'Enter' && onSearch(value)}
-          placeholder="AAPL, INFY.NS, TSLA…"
-          style={{
-            flex: 1, background: 'transparent', border: 'none', outline: 'none',
-            color: 'var(--text-primary)', fontFamily: 'var(--font-mono)', fontSize: 14,
-            padding: '10px 0',
-          }}
-        />
-        {loading && <div style={{ padding: '0 10px' }}><Spinner /></div>}
-      </div>
-      <button
-        onClick={() => onSearch(value)}
-        disabled={loading}
-        style={{
-          padding: '10px 20px', borderRadius: 'var(--radius-md)',
-          background: 'var(--accent-cyan)', color: '#080c12',
-          border: 'none', cursor: loading ? 'not-allowed' : 'pointer',
-          fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 13,
-          letterSpacing: '0.05em', opacity: loading ? 0.6 : 1,
-          transition: 'opacity 0.2s',
-        }}
-      >
-        ANALYZE
-      </button>
-    </div>
-  )
-}
-
-// ── Card wrapper ──────────────────────────────────────────────────────────
+// ── Card Wrapper ───────────────────────────────────────────────────────────
 
 function Card({ title, children, span }) {
   return (
@@ -267,47 +217,19 @@ function Card({ title, children, span }) {
   )
 }
 
-// ── Main Dashboard ────────────────────────────────────────────────────────
+// ── Main Dashboard ─────────────────────────────────────────────────────────
 
-export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
+export default function Dashboard({ ticker }) {
   const { data, loading, error } = useAnalysis(ticker)
   const [chatOpen, setChatOpen]  = useState(false)
 
   const ind      = data?.indicators ?? {}
   const forecast = data?.forecast   ?? {}
-
-  const rsiStatus = ind.rsi == null ? null : ind.rsi < 30 ? 'bullish' : ind.rsi > 70 ? 'bearish' : 'neutral'
   const signalColor = SIGNAL_CFG[data?.signal]?.color ?? 'var(--signal-hold)'
+  const rsiStatus   = ind.rsi == null ? null : ind.rsi < 30 ? 'bullish' : ind.rsi > 70 ? 'bearish' : 'neutral'
 
   return (
     <>
-      {/* ── Sticky Header ── */}
-      <header style={{
-        background: 'rgba(8,12,18,0.85)', backdropFilter: 'blur(12px)',
-        borderBottom: '1px solid var(--border-subtle)',
-        padding: '16px 32px', position: 'sticky', top: 0, zIndex: 100,
-        display: 'flex', alignItems: 'center', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-          <div style={{
-            width: 36, height: 36, borderRadius: 8,
-            background: 'var(--accent-cyan)', color: '#080c12',
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 18,
-          }}>Φ</div>
-          <div>
-            <h1 style={{ fontFamily: 'var(--font-display)', fontWeight: 800, fontSize: 17, letterSpacing: '0.02em' }}>
-              Financial Intelligence Suite
-            </h1>
-            <p style={{ fontSize: 10, color: 'var(--text-muted)', letterSpacing: '0.1em' }}>
-              POWERED BY ARIA · NOT FINANCIAL ADVICE
-            </p>
-          </div>
-        </div>
-        <SearchBar value={input} onChange={onInputChange} onSearch={onSearch} loading={loading} />
-      </header>
-
-      {/* ── Body ── */}
       <main style={{ maxWidth: 1400, margin: '0 auto', padding: '28px 32px 100px' }}>
 
         {error && (
@@ -326,13 +248,16 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
             <p style={{ fontFamily: 'var(--font-display)', letterSpacing: '0.1em' }}>
               FETCHING MARKET DATA FOR {ticker}…
             </p>
+            <p style={{ fontSize: 11, color: 'var(--text-muted)', marginTop: 8 }}>
+              First load may take 30–60s on free tier
+            </p>
           </div>
         )}
 
         {data && (
           <div style={{ animation: 'fade-in-up 0.35s ease forwards' }}>
 
-            {/* ── Ticker Hero ── */}
+            {/* Ticker Hero */}
             <div style={{
               display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start',
               flexWrap: 'wrap', gap: 16, marginBottom: 28,
@@ -362,10 +287,10 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                 </div>
 
                 <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
-                  {data.sector    && <Tag>{data.sector}</Tag>}
+                  {data.sector     && <Tag>{data.sector}</Tag>}
                   {data.market_cap && <Tag>MCap {formatBigNum(data.market_cap)}</Tag>}
-                  {data.pe_ratio  && <Tag>P/E {data.pe_ratio?.toFixed(1)}</Tag>}
-                  {data.cached    && <Tag color="var(--text-muted)">↻ cached</Tag>}
+                  {data.pe_ratio   && <Tag>P/E {data.pe_ratio?.toFixed(1)}</Tag>}
+                  {data.cached     && <Tag color="var(--text-muted)">↻ cached</Tag>}
                 </div>
               </div>
 
@@ -375,23 +300,20 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
               </div>
             </div>
 
-            {/* ── Grid ── */}
+            {/* Grid */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: 20 }}>
 
-              {/* Price Chart – full width */}
               <Card title="Price History + 7-Day ML Forecast" span>
                 <PriceChart historical={data.historical_prices} forecast={forecast} currency={data.currency} />
               </Card>
 
-              {/* Technical Indicators */}
               <Card title="Technical Indicators">
-                <IndRow label="RSI (14)"        value={ind.rsi?.toFixed(2)}            status={rsiStatus} />
-                <IndRow label="MACD"            value={ind.macd?.toFixed(4)}           status={ind.macd_histogram > 0 ? 'bullish' : 'bearish'} />
-                <IndRow label="MACD Signal"     value={ind.macd_signal?.toFixed(4)} />
-                <IndRow label="MACD Histogram"  value={ind.macd_histogram?.toFixed(4)} status={ind.macd_histogram > 0 ? 'bullish' : 'bearish'} />
-                <IndRow label="50-Day SMA"      value={ind.sma_50?.toFixed(2)}         status={ind.price_vs_sma50 === 'above' ? 'bullish' : 'bearish'} />
-                <IndRow label="200-Day SMA"     value={ind.sma_200?.toFixed(2)}        status={ind.price_vs_sma200 === 'above' ? 'bullish' : 'bearish'} />
-
+                <IndRow label="RSI (14)"       value={ind.rsi?.toFixed(2)}           status={rsiStatus} />
+                <IndRow label="MACD"           value={ind.macd?.toFixed(4)}          status={ind.macd_histogram > 0 ? 'bullish' : 'bearish'} />
+                <IndRow label="MACD Signal"    value={ind.macd_signal?.toFixed(4)} />
+                <IndRow label="MACD Histogram" value={ind.macd_histogram?.toFixed(4)} status={ind.macd_histogram > 0 ? 'bullish' : 'bearish'} />
+                <IndRow label="50-Day SMA"     value={ind.sma_50?.toFixed(2)}        status={ind.price_vs_sma50  === 'above' ? 'bullish' : 'bearish'} />
+                <IndRow label="200-Day SMA"    value={ind.sma_200?.toFixed(2)}       status={ind.price_vs_sma200 === 'above' ? 'bullish' : 'bearish'} />
                 {ind.golden_cross && (
                   <div style={{ marginTop: 12, padding: '8px 12px', borderRadius: 'var(--radius-sm)', background: 'var(--signal-buy-dim)', color: 'var(--signal-buy)', fontSize: 12 }}>
                     ✦ Golden Cross Active
@@ -404,14 +326,14 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                 )}
               </Card>
 
-              {/* 7-Day Forecast */}
               <Card title="7-Day Price Forecast">
                 {forecast.dates?.length > 0 ? (
                   <>
                     <div style={{ marginBottom: 14 }}>
                       <span style={{
                         padding: '4px 14px', borderRadius: 20, fontSize: 12,
-                        fontFamily: 'var(--font-display)', fontWeight: 600, textTransform: 'uppercase', letterSpacing: '0.06em',
+                        fontFamily: 'var(--font-display)', fontWeight: 600,
+                        textTransform: 'uppercase', letterSpacing: '0.06em',
                         background: forecast.direction === 'bullish' ? 'var(--signal-buy-dim)'
                                   : forecast.direction === 'bearish' ? 'var(--signal-sell-dim)' : 'var(--signal-hold-dim)',
                         color: forecast.direction === 'bullish' ? 'var(--signal-buy)'
@@ -420,7 +342,6 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                         {forecast.direction} · {forecast.expected_return_pct >= 0 ? '+' : ''}{forecast.expected_return_pct?.toFixed(2)}%
                       </span>
                     </div>
-
                     {forecast.dates.map((date, i) => (
                       <div key={date} style={{
                         display: 'flex', justifyContent: 'space-between', alignItems: 'center',
@@ -437,9 +358,8 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                         </div>
                       </div>
                     ))}
-
                     <p style={{ marginTop: 12, fontSize: 10, color: 'var(--text-muted)', lineHeight: 1.7, fontStyle: 'italic' }}>
-                      ⚠ Probabilistic estimates based on a Random Forest model. Not a guarantee of future performance.
+                      ⚠ Probabilistic ML estimates. Not a guarantee of future performance.
                     </p>
                   </>
                 ) : (
@@ -447,13 +367,12 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                 )}
               </Card>
 
-              {/* Quick Metrics */}
               <Card title="Quick Metrics">
                 <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10, marginBottom: 14 }}>
                   <MetricCard label="Signal Strength" value={`${data.signal_strength?.toFixed(0)}/100`} accent={signalColor} />
-                  <MetricCard label="Currency" value={data.currency} />
-                  <MetricCard label="P/E Ratio" value={data.pe_ratio?.toFixed(1)} />
-                  <MetricCard label="Market Cap" value={formatBigNum(data.market_cap)} />
+                  <MetricCard label="Currency"        value={data.currency} />
+                  <MetricCard label="P/E Ratio"       value={data.pe_ratio?.toFixed(1)} />
+                  <MetricCard label="Market Cap"      value={formatBigNum(data.market_cap)} />
                 </div>
                 <div style={{
                   padding: '10px 14px', borderRadius: 'var(--radius-sm)',
@@ -462,8 +381,7 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                   <p style={{ fontSize: 10, color: 'var(--text-muted)', marginBottom: 6, letterSpacing: '0.08em' }}>INVESTMENT SIGNAL</p>
                   <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
                     <div style={{
-                      width: 12, height: 12, borderRadius: '50%',
-                      background: signalColor,
+                      width: 12, height: 12, borderRadius: '50%', background: signalColor,
                       boxShadow: `0 0 8px ${signalColor}`,
                     }} />
                     <span style={{ fontFamily: 'var(--font-display)', fontWeight: 700, fontSize: 15, color: signalColor }}>
@@ -472,7 +390,6 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
                   </div>
                 </div>
               </Card>
-
             </div>
 
             {/* Disclaimer */}
@@ -490,13 +407,11 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
         )}
       </main>
 
-      {/* ── Footer ── */}
+      {/* Footer */}
       <footer style={{
-        borderTop: '1px solid var(--border-subtle)',
-        padding: '20px 32px',
+        borderTop: '1px solid var(--border-subtle)', padding: '20px 32px',
         display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-        flexWrap: 'wrap', gap: 10,
-        background: 'var(--bg-deep)',
+        flexWrap: 'wrap', gap: 10, background: 'var(--bg-deep)',
       }}>
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
           <div style={{
@@ -514,7 +429,6 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
             </p>
           </div>
         </div>
-
         <div style={{ display: 'flex', gap: 20, alignItems: 'center' }}>
           <span style={{ fontSize: 11, color: 'var(--text-muted)' }}>
             Powered by <span style={{ color: 'var(--text-secondary)' }}>Ollama</span> · <span style={{ color: 'var(--text-secondary)' }}>FastAPI</span> · <span style={{ color: 'var(--text-secondary)' }}>React</span>
@@ -523,13 +437,11 @@ export default function Dashboard({ ticker, input, onInputChange, onSearch }) {
             fontSize: 10, padding: '3px 10px', borderRadius: 20,
             background: 'var(--signal-sell-dim)', color: 'var(--signal-sell)',
             border: '1px solid rgba(239,68,68,0.2)',
-          }}>
-            ⚠ Not Financial Advice
-          </span>
+          }}>⚠ Not Financial Advice</span>
         </div>
       </footer>
 
-      {/* ── Chat FAB ── */}
+      {/* Chat FAB */}
       <button
         onClick={() => setChatOpen(o => !o)}
         title="Chat with ARIA"
