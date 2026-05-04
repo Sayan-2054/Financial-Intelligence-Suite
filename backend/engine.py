@@ -226,7 +226,7 @@ class FinancialEngine:
             ticker           = ticker,
             company_name     = info.get("longName", ticker),
             current_price    = indicators.current_price or 0.0,
-            currency         = info.get("currency", "USD"),
+            currency         = self._resolve_currency(ticker, info),
             indicators       = indicators,
             forecast         = forecast,
             signal           = signal,
@@ -236,6 +236,27 @@ class FinancialEngine:
             market_cap       = info.get("marketCap"),
             pe_ratio         = info.get("trailingPE"),
         )
+
+    @staticmethod
+    def _resolve_currency(ticker: str, info: dict) -> str:
+        """
+        yfinance sometimes returns 'USD' for Indian stocks.
+        Override based on ticker suffix to get the correct currency.
+        """
+        if ticker.endswith(".NS") or ticker.endswith(".BO"):
+            return "INR"
+        if ticker.endswith(".L"):
+            return "GBP"
+        if ticker.endswith(".PA") or ticker.endswith(".DE") or ticker.endswith(".AS"):
+            return "EUR"
+        if ticker.endswith(".T"):
+            return "JPY"
+        if ticker.endswith(".HK"):
+            return "HKD"
+        if ticker.endswith(".AX"):
+            return "AUD"
+        # Fall back to what yfinance says
+        return info.get("currency", "USD")
 
     # ------------------------------------------------------------------
     # Private
