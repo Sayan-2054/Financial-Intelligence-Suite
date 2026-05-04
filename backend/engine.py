@@ -321,11 +321,44 @@ class FinancialEngine:
         df.index = pd.to_datetime(df.index)
         df.sort_index(inplace=True)
 
-        # info can fail for some tickers — degrade gracefully
+        # yfinance 1.3.0 — info can fail or return partial data
+        # Try multiple approaches to get fundamental data
+        info = {}
         try:
-            info = stock.info or {}
+            raw_info = stock.info or {}
+            if raw_info and len(raw_info) > 5:  # real data, not empty stub
+                info = raw_info
         except Exception:
-            info = {}
+            pass
+
+        # If info is empty or missing key fields, try fast_info
+        if not info.get("marketCap") and not info.get("market_cap"):
+            try:
+                fi = stock.fast_info
+                # fast_info has different attribute names
+                if not info:
+                    info = {}
+                if hasattr(fi, 'market_cap') and fi.market_cap:
+                    info['marketCap'] = fi.market_cap
+                if hasattr(fi, 'quote_type'):
+                    info['quoteType'] = fi.quote_type
+                if not info.get('longName') and hasattr(fi, 'currency'):
+                    info['currency'] = fi.currency
+            except Exception:
+                pass
+
+        # Normalize key variants yfinance uses across versions
+        # Market cap
+        for key in ('marketCap', 'market_cap', 'MarketCap'):
+            if info.get(key):
+                info['marketCap'] = info[key]
+                break
+
+        # P/E ratio — try multiple key names
+        for key in ('trailingPE', 'trailing_pe', 'trailingP/E', 'peRatio', 'pe_ratio'):
+            if info.get(key):
+                info['trailingPE'] = info[key]
+                break
 
         return df, info
 

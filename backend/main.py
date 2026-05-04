@@ -106,8 +106,10 @@ def _sanitize(obj):
     """
     Recursively convert numpy scalars → native Python types so FastAPI's
     jsonable_encoder never sees numpy.bool_, numpy.float64, etc.
+    Also handles float NaN/Inf which JSON doesn't support.
     """
     import numpy as np
+    import math
     if isinstance(obj, dict):
         return {k: _sanitize(v) for k, v in obj.items()}
     if isinstance(obj, list):
@@ -117,7 +119,13 @@ def _sanitize(obj):
     if isinstance(obj, np.integer):
         return int(obj)
     if isinstance(obj, np.floating):
-        return None if np.isnan(obj) else float(obj)
+        if np.isnan(obj) or np.isinf(obj):
+            return None
+        return float(obj)
+    if isinstance(obj, float):
+        if math.isnan(obj) or math.isinf(obj):
+            return None
+        return obj
     if isinstance(obj, np.ndarray):
         return [_sanitize(v) for v in obj.tolist()]
     return obj
