@@ -208,18 +208,31 @@ class FinancialEngine:
         self._predictor  = RandomForestPredictor()
         self._signal_gen = SignalGenerator()
 
-    def analyze(self, ticker: str, period: str = "2y") -> AnalysisResult:
+    def analyze(self, ticker: str, period: str = "6mo") -> AnalysisResult:
         ticker = ticker.upper().strip()
         logger.info("Analyzing %s period=%s", ticker, period)
 
         try:
-            df, info = self._fetch(ticker, period)
+            # Always fetch 2y daily data for indicators + ML model
+            df_model, info = self._fetch(ticker, "2y")
+            # Fetch selected period for chart display
+            if period in ("2y", "max", "5y", "10y"):
+                df_display = self._fetch(ticker, period)[0]
+            else:
+                df_display = df_model  # use model data for short periods
+                # For short intraday periods, fetch separately
+                if period in ("1d", "5d", "1mo", "3mo", "6mo", "1y"):
+                    try:
+                        df_display = self._fetch(ticker, period)[0]
+                    except Exception:
+                        df_display = df_model
         except Exception as exc:
             logger.error("Fetch failed for %s: %s", ticker, exc)
             return self._error_result(ticker, str(exc))
 
-        indicators = self._indicators(df)
-        forecast   = self._forecast(df)
+        # Indicators and forecast always use 2y daily data for accuracy
+        indicators = self._indicators(df_model)
+        forecast   = self._forecast(df_model)
         signal, strength = self._signal_gen.compute(indicators, forecast)
 
         return AnalysisResult(
@@ -231,7 +244,7 @@ class FinancialEngine:
             forecast         = forecast,
             signal           = signal,
             signal_strength  = strength,
-            historical_prices= self._serialize(df),
+            historical_prices= self._serialize(df_display),
             sector           = info.get("sector"),
             market_cap       = info.get("marketCap"),
             pe_ratio         = info.get("trailingPE"),
@@ -375,17 +388,19 @@ class FinancialEngine:
         return fc
 
     @staticmethod
-    def _serialize(df: pd.DataFrame, tail: int = 180) -> list[dict]:
+    def _serialize(df: pd.DataFrame, max_rows: int = 1000) -> list[dict]:
+        # For intraday data (many rows), limit to keep response size reasonable
+        subset = df.tail(max_rows)
         return [
             {
-                "date":   idx.strftime("%Y-%m-%d"),
+                "date":   idx.strftime("%Y-%m-%d %H:%M") if hasattr(idx, 'hour') and idx.hour != 0 else idx.strftime("%Y-%m-%d"),
                 "open":   round(float(row.get("Open",   0)), 4),
                 "high":   round(float(row.get("High",   0)), 4),
                 "low":    round(float(row.get("Low",    0)), 4),
                 "close":  round(float(row.get("Close",  0)), 4),
                 "volume": int(row.get("Volume", 0)),
             }
-            for idx, row in df.tail(tail).iterrows()
+            for idx, row in subset.iterrows()
         ]
 
     @staticmethod
