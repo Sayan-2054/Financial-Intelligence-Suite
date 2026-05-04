@@ -5,12 +5,14 @@ export function formatPrice(value, currency = 'USD') {
   return `${sym}${Number(value).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
 }
 
-export function formatBigNum(n) {
+export function formatBigNum(n, currency = 'USD') {
   if (n == null) return '—'
-  if (n >= 1e12) return `$${(n / 1e12).toFixed(2)}T`
-  if (n >= 1e9)  return `$${(n / 1e9).toFixed(2)}B`
-  if (n >= 1e6)  return `$${(n / 1e6).toFixed(2)}M`
-  return `$${n.toLocaleString()}`
+  const syms = { USD: '$', INR: '₹', EUR: '€', GBP: '£', JPY: '¥' }
+  const sym = syms[currency] ?? `${currency} `
+  if (n >= 1e12) return `${sym}${(n / 1e12).toFixed(2)}T`
+  if (n >= 1e9)  return `${sym}${(n / 1e9).toFixed(2)}B`
+  if (n >= 1e6)  return `${sym}${(n / 1e6).toFixed(2)}M`
+  return `${sym}${n.toLocaleString()}`
 }
 
 export function fmtDate(str) {

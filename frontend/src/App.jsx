@@ -75,6 +75,24 @@ export default function App() {
 
         {/* Smart Search Bar */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+          {/* Back button — only shown when viewing a stock */}
+          {ticker && (
+            <button
+              onClick={goHome}
+              style={{
+                padding: '10px 14px', borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
+                color: 'var(--text-secondary)', cursor: 'pointer',
+                fontFamily: 'var(--font-display)', fontWeight: 700,
+                fontSize: 12, letterSpacing: '0.05em', transition: 'all 0.2s',
+                display: 'flex', alignItems: 'center', gap: 6, whiteSpace: 'nowrap',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.color = 'var(--accent-cyan)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+            >
+              ← Back
+            </button>
+          )}
           <SearchBar
             onSearch={navigateTo}
             loading={loading}

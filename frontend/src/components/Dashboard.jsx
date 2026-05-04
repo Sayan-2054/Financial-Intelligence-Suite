@@ -147,7 +147,7 @@ function ChartTip({ active, payload, label }) {
 // ── Price Chart ────────────────────────────────────────────────────────────
 
 function PriceChart({ historical = [], forecast = {}, currency = 'USD' }) {
-  const sym = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[currency] ??  currency + ' '
+  const sym = { USD: '$', INR: '₹', EUR: '€', GBP: '£' }[currency] ?? `${currency} `
 
   const hist  = historical.slice(-90).map(d => ({ date: fmtDate(d.date), close: d.close }))
   const fcast = (forecast.dates ?? []).map((date, i) => ({
@@ -319,7 +319,7 @@ export default function Dashboard({ ticker }) {
 
                 <div style={{ display: 'flex', gap: 6, marginTop: 8, flexWrap: 'wrap' }}>
                   {data.sector     && <Tag>{data.sector}</Tag>}
-                  {data.market_cap && <Tag>MCap {formatBigNum(data.market_cap)}</Tag>}
+                  {data.market_cap && <Tag>MCap {formatBigNum(data.market_cap, data.currency)}</Tag>}
                   {data.pe_ratio   && <Tag>P/E {data.pe_ratio?.toFixed(1)}</Tag>}
                   {data.cached     && <Tag color="var(--text-muted)">↻ cached</Tag>}
                 </div>
@@ -439,7 +439,7 @@ export default function Dashboard({ ticker }) {
                   <MetricCard label="Signal Strength" value={`${data.signal_strength?.toFixed(0)}/100`} accent={signalColor} />
                   <MetricCard label="Currency"        value={data.currency} />
                   <MetricCard label="P/E Ratio"       value={data.pe_ratio?.toFixed(1)} />
-                  <MetricCard label="Market Cap"      value={formatBigNum(data.market_cap)} />
+                  <MetricCard label="Market Cap"      value={formatBigNum(data.market_cap, data.currency)} />
                 </div>
                 <div style={{
                   padding: '10px 14px', borderRadius: 'var(--radius-sm)',
