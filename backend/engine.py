@@ -321,40 +321,63 @@ class FinancialEngine:
         df.index = pd.to_datetime(df.index)
         df.sort_index(inplace=True)
 
-        # yfinance 1.3.0 — info can fail or return partial data
-        # Try multiple approaches to get fundamental data
+        # yfinance 1.3.0 on Linux (Render) behaves differently than Windows.
+        # Use multiple fallback approaches to get fundamental data.
         info = {}
+
+        # Approach 1: stock.info (works on Windows, sometimes fails on Linux)
         try:
             raw_info = stock.info or {}
-            if raw_info and len(raw_info) > 5:  # real data, not empty stub
-                info = raw_info
+            if isinstance(raw_info, dict) and len(raw_info) > 5:
+                info = dict(raw_info)
         except Exception:
             pass
 
-        # If info is empty or missing key fields, try fast_info
-        if not info.get("marketCap") and not info.get("market_cap"):
+        # Approach 2: fast_info (lightweight, works reliably on Linux)
+        try:
+            fi = stock.fast_info
+            if hasattr(fi, 'market_cap') and fi.market_cap:
+                info.setdefault('marketCap', fi.market_cap)
+            if hasattr(fi, 'currency') and fi.currency:
+                info.setdefault('currency', fi.currency)
+            if hasattr(fi, 'shares') and fi.shares:
+                info.setdefault('sharesOutstanding', fi.shares)
+            # Compute P/E from fast_info if missing
+            if not info.get('trailingPE'):
+                pe = getattr(fi, 'pe_ratio', None) or getattr(fi, 'trailing_pe', None)
+                if pe and pe > 0:
+                    info['trailingPE'] = pe
+        except Exception:
+            pass
+
+        # Approach 3: compute P/E manually from financials if still missing
+        if not info.get('trailingPE'):
             try:
-                fi = stock.fast_info
-                # fast_info has different attribute names
-                if not info:
-                    info = {}
-                if hasattr(fi, 'market_cap') and fi.market_cap:
-                    info['marketCap'] = fi.market_cap
-                if hasattr(fi, 'quote_type'):
-                    info['quoteType'] = fi.quote_type
-                if not info.get('longName') and hasattr(fi, 'currency'):
-                    info['currency'] = fi.currency
+                income = stock.financials
+                if income is not None and not income.empty:
+                    net_income_row = None
+                    for row_name in ['Net Income', 'Net Income Common Stockholders', 'NetIncome']:
+                        if row_name in income.index:
+                            net_income_row = income.loc[row_name]
+                            break
+                    if net_income_row is not None and len(net_income_row) > 0:
+                        net_income = float(net_income_row.iloc[0])
+                        shares = info.get('sharesOutstanding') or info.get('impliedSharesOutstanding')
+                        current_price = float(df['Close'].iloc[-1])
+                        if shares and shares > 0 and net_income > 0:
+                            eps = net_income / shares
+                            pe = current_price / eps
+                            if 0 < pe < 500:  # sanity check
+                                info['trailingPE'] = round(pe, 2)
             except Exception:
                 pass
 
-        # Normalize key variants yfinance uses across versions
-        # Market cap
+        # Normalize key name variants across yfinance versions
         for key in ('marketCap', 'market_cap', 'MarketCap'):
             if info.get(key):
                 info['marketCap'] = info[key]
                 break
 
-        # P/E ratio — try multiple key names
         for key in ('trailingPE', 'trailing_pe', 'trailingP/E', 'peRatio', 'pe_ratio'):
             if info.get(key):
                 info['trailingPE'] = info[key]

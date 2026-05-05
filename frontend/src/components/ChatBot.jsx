@@ -79,7 +79,7 @@ function Typing() {
   )
 }
 
-export default function ChatBot({ ticker, hasAnalysis, onClose }) {
+export default function ChatBot({ ticker, hasAnalysis, onClose, context = null }) {
   const [messages,   setMessages]   = useState([{ role: 'assistant', content: INTRO }])
   const [input,      setInput]      = useState('')
   const [loading,    setLoading]    = useState(false)
@@ -101,6 +101,8 @@ export default function ChatBot({ ticker, hasAnalysis, onClose }) {
         message:    msg,
         ticker:     hasAnalysis ? ticker : undefined,
         session_id: sessionId,
+        // Pass MF context as part of message if available
+        ...(context && !hasAnalysis ? { message: `Context:\n${context}\n\nQuestion: ${msg}` } : {}),
       })
       setMessages(prev => [...prev, { role: 'assistant', content: res.response }])
     } catch (err) {

@@ -63,7 +63,7 @@ export default function HomePage({ onSelectTicker, recentlyViewed }) {
     }
     if (e.key === 'ArrowDown')  { e.preventDefault(); setHighlight(h => Math.min(h+1, results.length-1)) }
     else if (e.key === 'ArrowUp')  { e.preventDefault(); setHighlight(h => Math.max(h-1, 0)) }
-    else if (e.key === 'Enter')    { e.preventDefault(); highlight >= 0 ? handleSelect(results[highlight].ticker) : handleSelect(query.trim()) }
+    else if (e.key === 'Enter')    { e.preventDefault(); handleSelect(results[highlight >= 0 ? highlight : 0].ticker) }
     else if (e.key === 'Escape')   { setShowDrop(false) }
   }
 

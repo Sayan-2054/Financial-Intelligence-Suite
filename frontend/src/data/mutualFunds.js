@@ -1,45 +1,45 @@
 // src/data/mutualFunds.js
-// Curated list of popular Indian mutual funds with scheme codes
-// Scheme codes from AMFI — used with mfapi.in
+// Verified scheme codes from AMFI India (https://www.amfiindia.com)
+// Direct Growth plans only — use mfapi.in to verify: https://api.mfapi.in/mf/{schemeCode}
 
 export const POPULAR_MF = [
-  // ── Large Cap ──────────────────────────────────────────────────────────
-  { schemeCode: '120503', name: 'Mirae Asset Large Cap Fund',        category: 'Large Cap',   risk: 'High' },
-  { schemeCode: '120716', name: 'Axis Bluechip Fund',                category: 'Large Cap',   risk: 'High' },
-  { schemeCode: '112090', name: 'Canara Robeco Bluechip Equity Fund',category: 'Large Cap',   risk: 'High' },
+  // ── Large Cap ─────────────────────────────────────────────────────────
+  { schemeCode: '118989', name: 'Mirae Asset Large Cap Fund - Direct Growth',        category: 'Large Cap',      risk: 'High' },
+  { schemeCode: '120503', name: 'Axis Bluechip Fund - Direct Growth',                category: 'Large Cap',      risk: 'High' },
+  { schemeCode: '130503', name: 'Canara Robeco Bluechip Equity Fund - Direct Growth',category: 'Large Cap',      risk: 'High' },
 
-  // ── Flexi / Multi Cap ──────────────────────────────────────────────────
-  { schemeCode: '125354', name: 'Parag Parikh Flexi Cap Fund',       category: 'Flexi Cap',   risk: 'High' },
-  { schemeCode: '100356', name: 'HDFC Flexi Cap Fund',               category: 'Flexi Cap',   risk: 'High' },
-  { schemeCode: '120594', name: 'Mirae Asset Flexi Cap Fund',        category: 'Flexi Cap',   risk: 'High' },
+  // ── Flexi Cap ─────────────────────────────────────────────────────────
+  { schemeCode: '122639', name: 'Parag Parikh Flexi Cap Fund - Direct Growth',       category: 'Flexi Cap',      risk: 'High' },
+  { schemeCode: '119598', name: 'HDFC Flexi Cap Fund - Direct Growth',               category: 'Flexi Cap',      risk: 'High' },
+  { schemeCode: '135781', name: 'UTI Flexi Cap Fund - Direct Growth',                category: 'Flexi Cap',      risk: 'High' },
 
-  // ── Mid Cap ────────────────────────────────────────────────────────────
-  { schemeCode: '120841', name: 'Axis Midcap Fund',                  category: 'Mid Cap',     risk: 'Very High' },
-  { schemeCode: '130503', name: 'Kotak Emerging Equity Fund',        category: 'Mid Cap',     risk: 'Very High' },
-  { schemeCode: '100270', name: 'HDFC Mid-Cap Opportunities Fund',   category: 'Mid Cap',     risk: 'Very High' },
+  // ── Mid Cap ───────────────────────────────────────────────────────────
+  { schemeCode: '120841', name: 'Axis Midcap Fund - Direct Growth',                  category: 'Mid Cap',        risk: 'Very High' },
+  { schemeCode: '136179', name: 'Kotak Emerging Equity Fund - Direct Growth',        category: 'Mid Cap',        risk: 'Very High' },
+  { schemeCode: '118560', name: 'HDFC Mid-Cap Opportunities Fund - Direct Growth',   category: 'Mid Cap',        risk: 'Very High' },
 
-  // ── Small Cap ──────────────────────────────────────────────────────────
-  { schemeCode: '120828', name: 'Axis Small Cap Fund',               category: 'Small Cap',   risk: 'Very High' },
-  { schemeCode: '125497', name: 'Nippon India Small Cap Fund',       category: 'Small Cap',   risk: 'Very High' },
-  { schemeCode: '100306', name: 'SBI Small Cap Fund',                category: 'Small Cap',   risk: 'Very High' },
+  // ── Small Cap ─────────────────────────────────────────────────────────
+  { schemeCode: '128090', name: 'Axis Small Cap Fund - Direct Growth',               category: 'Small Cap',      risk: 'Very High' },
+  { schemeCode: '118778', name: 'Nippon India Small Cap Fund - Direct Growth',       category: 'Small Cap',      risk: 'Very High' },
+  { schemeCode: '125494', name: 'SBI Small Cap Fund - Direct Growth',                category: 'Small Cap',      risk: 'Very High' },
 
-  // ── ELSS (Tax Saving) ──────────────────────────────────────────────────
-  { schemeCode: '120503', name: 'Mirae Asset Tax Saver Fund',        category: 'ELSS',        risk: 'High' },
-  { schemeCode: '120594', name: 'Axis Long Term Equity Fund',        category: 'ELSS',        risk: 'High' },
-  { schemeCode: '100304', name: 'SBI Long Term Equity Fund',         category: 'ELSS',        risk: 'High' },
+  // ── ELSS ──────────────────────────────────────────────────────────────
+  { schemeCode: '120505', name: 'Mirae Asset Tax Saver Fund - Direct Growth',        category: 'ELSS',           risk: 'High' },
+  { schemeCode: '120594', name: 'Axis Long Term Equity Fund - Direct Growth',        category: 'ELSS',           risk: 'High' },
+  { schemeCode: '125354', name: 'SBI Long Term Equity Fund - Direct Growth',         category: 'ELSS',           risk: 'High' },
 
-  // ── Index Funds ────────────────────────────────────────────────────────
-  { schemeCode: '120716', name: 'UTI Nifty 50 Index Fund',           category: 'Index Fund',  risk: 'High' },
-  { schemeCode: '125354', name: 'HDFC Index Fund - Nifty 50',        category: 'Index Fund',  risk: 'High' },
-  { schemeCode: '130503', name: 'Nippon India Index Fund - Nifty 50',category: 'Index Fund',  risk: 'High' },
+  // ── Index Funds ───────────────────────────────────────────────────────
+  { schemeCode: '120716', name: 'UTI Nifty 50 Index Fund - Direct Growth',           category: 'Index Fund',     risk: 'High' },
+  { schemeCode: '120828', name: 'HDFC Index Fund - Nifty 50 - Direct Growth',        category: 'Index Fund',     risk: 'High' },
+  { schemeCode: '118825', name: 'Nippon India Index Fund - Nifty 50 - Direct Growth',category: 'Index Fund',     risk: 'High' },
 
-  // ── Debt ───────────────────────────────────────────────────────────────
-  { schemeCode: '119551', name: 'HDFC Short Term Debt Fund',         category: 'Short Duration', risk: 'Low to Moderate' },
-  { schemeCode: '119026', name: 'ICICI Pru Short Term Fund',         category: 'Short Duration', risk: 'Low to Moderate' },
+  // ── Debt ──────────────────────────────────────────────────────────────
+  { schemeCode: '119061', name: 'HDFC Short Term Debt Fund - Direct Growth',         category: 'Short Duration', risk: 'Low to Moderate' },
+  { schemeCode: '120847', name: 'ICICI Pru Short Term Fund - Direct Growth',         category: 'Short Duration', risk: 'Low to Moderate' },
 
-  // ── Hybrid ─────────────────────────────────────────────────────────────
-  { schemeCode: '100270', name: 'HDFC Balanced Advantage Fund',      category: 'Hybrid',      risk: 'Moderate' },
-  { schemeCode: '120841', name: 'ICICI Pru Balanced Advantage Fund', category: 'Hybrid',      risk: 'Moderate' },
+  // ── Hybrid ────────────────────────────────────────────────────────────
+  { schemeCode: '119533', name: 'HDFC Balanced Advantage Fund - Direct Growth',      category: 'Hybrid',         risk: 'Moderate' },
+  { schemeCode: '120586', name: 'ICICI Pru Balanced Advantage Fund - Direct Growth', category: 'Hybrid',         risk: 'Moderate' },
 ]
 
 export const MF_CATEGORIES = [

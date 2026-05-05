@@ -8,6 +8,7 @@ import { useMutualFund }          from '../hooks/useMutualFund.js'
 import { filterNavByPeriod }      from '../api/mfClient.js'
 import { RISK_COLOR }             from '../data/mutualFunds.js'
 import SIPCalculator              from './SIPCalculator.jsx'
+import ChatBot                    from './ChatBot.jsx'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -136,6 +137,7 @@ function NAVChart({ navHistory }) {
 
 export default function MFDashboard({ schemeCode, schemeName }) {
   const { data, loading, error, retry } = useMutualFund(schemeCode)
+  const [chatOpen, setChatOpen] = useState(false)
 
   return (
     <main style={{ maxWidth: 1400, margin: '0 auto', padding: '28px 32px 100px' }}>
@@ -269,6 +271,32 @@ export default function MFDashboard({ schemeCode, schemeName }) {
             Consult a SEBI-registered investment advisor before investing.
           </div>
         </div>
+      )}
+      {/* ── Chat FAB ── */}
+      <button
+        onClick={() => setChatOpen(o => !o)}
+        title="Ask ARIA about this fund"
+        style={{
+          position: 'fixed', bottom: 28, right: 28, zIndex: 300,
+          width: 52, height: 52, borderRadius: '50%',
+          background: chatOpen ? 'var(--bg-elevated)' : 'var(--accent-indigo)',
+          color: chatOpen ? 'var(--text-secondary)' : '#fff',
+          border: '1px solid ' + (chatOpen ? 'var(--border-default)' : 'var(--accent-indigo)'),
+          cursor: 'pointer', fontSize: 22,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: '0 0 20px rgba(99,102,241,0.3)', transition: 'all 0.2s',
+        }}
+      >
+        {chatOpen ? '×' : '◎'}
+      </button>
+
+      {chatOpen && (
+        <ChatBot
+          ticker={null}
+          hasAnalysis={false}
+          onClose={() => setChatOpen(false)}
+          context={data ? `Mutual Fund: ${data.schemeName}\nFund House: ${data.fundHouse}\nCurrent NAV: ₹${data.currentNav?.toFixed(4)}\n1Y Return: ${data.returns.return_1y?.toFixed(2)}%\n3Y CAGR: ${data.returns.cagr_3y?.toFixed(2)}%\n5Y CAGR: ${data.returns.cagr_5y?.toFixed(2)}%` : null}
+        />
       )}
     </main>
   )

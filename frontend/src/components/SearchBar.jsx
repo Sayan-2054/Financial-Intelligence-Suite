@@ -41,7 +41,11 @@ export default function SearchBar({ onSearch, loading, initialValue = '' }) {
 
   function handleKeyDown(e) {
     if (!open || !results.length) {
-      if (e.key === 'Enter') { onSearch(input.trim()); setOpen(false) }
+      if (e.key === 'Enter' && input.trim()) {
+        // No dropdown open — search the raw input as ticker
+        onSearch(input.trim())
+        setOpen(false)
+      }
       return
     }
     if (e.key === 'ArrowDown') {
@@ -52,8 +56,9 @@ export default function SearchBar({ onSearch, loading, initialValue = '' }) {
       setHighlight(h => Math.max(h - 1, 0))
     } else if (e.key === 'Enter') {
       e.preventDefault()
-      if (highlight >= 0) handleSelect(results[highlight])
-      else { onSearch(input.trim()); setOpen(false) }
+      // Always select first result if nothing highlighted
+      const idx = highlight >= 0 ? highlight : 0
+      handleSelect(results[idx])
     } else if (e.key === 'Escape') {
       setOpen(false)
     }
