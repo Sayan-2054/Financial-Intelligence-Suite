@@ -6,6 +6,7 @@ import {
 import { useAnalysis }                         from '../hooks/useAnalysis.js'
 import { formatPrice, formatBigNum, fmtDate }  from '../utils/formatters.js'
 import ChatBot                                  from './ChatBot.jsx'
+import WatchlistButton                          from './WatchlistButton.jsx'
 
 // ── Atoms ──────────────────────────────────────────────────────────────────
 
@@ -300,6 +301,7 @@ export default function Dashboard({ ticker }) {
                     color: 'var(--accent-cyan)', letterSpacing: '-0.02em',
                   }}>{data.ticker}</h2>
                   <span style={{ color: 'var(--text-secondary)', fontSize: 15 }}>{data.company_name}</span>
+                  <WatchlistButton ticker={data.ticker} name={data.company_name} type="stock" size="sm" />
                 </div>
 
                 <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 6 }}>

@@ -9,6 +9,7 @@ import { filterNavByPeriod }      from '../api/mfClient.js'
 import { RISK_COLOR }             from '../data/mutualFunds.js'
 import SIPCalculator              from './SIPCalculator.jsx'
 import ChatBot                    from './ChatBot.jsx'
+import WatchlistButton            from './WatchlistButton.jsx'
 
 // ── Helpers ────────────────────────────────────────────────────────────────
 
@@ -194,6 +195,7 @@ export default function MFDashboard({ schemeCode, schemeName }) {
                       {data.fundHouse}
                     </p>
                   </div>
+                  <WatchlistButton ticker={schemeCode} name={data.schemeName} type="mf" size="sm" />
                 </div>
                 <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', marginTop: 8 }}>
                   {data.category && (
