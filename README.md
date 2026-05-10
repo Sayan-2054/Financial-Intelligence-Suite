@@ -5,6 +5,7 @@
 **Live Demo →** [financial-intelligence-suite-seven.vercel.app](https://financial-intelligence-suite-seven.vercel.app)
 
 ---
+![Home Page Screenshot](./frontend/src/assets/image.png)
 
 ## ✨ Features
 
