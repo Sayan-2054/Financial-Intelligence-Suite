@@ -126,7 +126,7 @@ export default function MFHomePage({ onSelectFund, recentlyViewed }) {
         <h1 style={{
           fontFamily: 'var(--font-display)', fontWeight: 800,
           fontSize: 'clamp(26px, 4vw, 44px)', lineHeight: 1.15,
-          background: 'linear-gradient(135deg, #e8edf5 0%, var(--accent-indigo) 60%, var(--accent-cyan) 100%)',
+          background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--accent-indigo) 60%, var(--accent-cyan) 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           marginBottom: 14,
         }}>

@@ -10,8 +10,9 @@ import PortfolioPage  from './components/PortfolioPage.jsx'
 import ComparisonPage from './components/ComparisonPage.jsx'
 import HowItWorks     from './components/HowItWorks.jsx'
 import OnboardingTour from './components/OnboardingTour.jsx'
-import { useWatchlist }   from './hooks/useWatchlist.js'
+import { useWatchlist }    from './hooks/useWatchlist.js'
 import { useLocalStorage } from './hooks/useLocalStorage.js'
+import { useTheme }        from './hooks/useTheme.js'
 
 const MAX_RECENT = 5
 
@@ -44,6 +45,9 @@ export default function App() {
 
   // ── Watchlist badge count ─────────────────────────────────────────────
   const { list: watchlist } = useWatchlist()
+
+  // ── Theme ─────────────────────────────────────────────────────────────
+  const { theme, toggle: toggleTheme, isDark } = useTheme()
 
   // ── Navigation ────────────────────────────────────────────────────────
   const navigateToStock = useCallback((t) => {
@@ -107,7 +111,7 @@ export default function App() {
 
       {/* ── Sticky Header ── */}
       <header style={{
-        background: 'rgba(8,12,18,0.92)', backdropFilter: 'blur(12px)',
+        background: 'var(--bg-deep)', backdropFilter: 'blur(12px)',
         borderBottom: '1px solid var(--border-subtle)',
         padding: '12px 24px', position: 'sticky', top: 0, zIndex: 100,
       }}>
@@ -176,6 +180,23 @@ export default function App() {
 
           {/* Right controls */}
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+
+            {/* Theme toggle */}
+            <button
+              onClick={toggleTheme}
+              title={isDark ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+              style={{
+                width: 34, height: 34, borderRadius: 'var(--radius-md)',
+                background: 'var(--bg-elevated)', border: '1px solid var(--border-default)',
+                color: 'var(--text-secondary)', cursor: 'pointer', fontSize: 16,
+                display: 'flex', alignItems: 'center', justifyContent: 'center',
+                transition: 'all 0.2s',
+              }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--accent-cyan)'; e.currentTarget.style.color = 'var(--accent-cyan)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--border-default)'; e.currentTarget.style.color = 'var(--text-secondary)' }}
+            >
+              {isDark ? '☀️' : '🌙'}
+            </button>
 
             {/* How It Works button */}
             <button

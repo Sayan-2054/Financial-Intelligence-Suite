@@ -7,6 +7,7 @@ import {
 import { fetchAnalysis }  from '../api/client.js'
 import { searchStocks }   from '../data/stocks.js'
 import { formatPrice }    from '../utils/formatters.js'
+import ChatBot            from './ChatBot.jsx'
 
 const COLORS = ['#22d3ee', '#a78bfa', '#fb923c']
 const MAX = 3
@@ -107,9 +108,10 @@ function StatRow({ label, values, format = v => v?.toFixed(2) ?? '—', highligh
 }
 
 export default function ComparisonPage({ onSelectTicker }) {
-  const [stocks,  setStocks]  = useState([])   // [{ ticker, name, ... }]
-  const [data,    setData]    = useState({})    // { ticker: analysisResult }
-  const [loading, setLoading] = useState({})
+  const [stocks,   setStocks]   = useState([])
+  const [data,     setData]     = useState({})
+  const [loading,  setLoading]  = useState({})
+  const [chatOpen, setChatOpen] = useState(false)
 
   function addStock(stock) {
     if (stocks.length >= MAX || stocks.find(s => s.ticker === stock.ticker)) return
@@ -273,6 +275,41 @@ export default function ComparisonPage({ onSelectTicker }) {
         <div style={{ textAlign: 'center', padding: '40px 0', color: 'var(--text-muted)' }}>
           <p style={{ fontSize: 14 }}>Add at least one more stock to compare</p>
         </div>
+      )}
+
+      {/* ARIA Chat FAB */}
+      <button
+        onClick={() => setChatOpen(o => !o)}
+        title="Ask ARIA about this comparison"
+        style={{
+          position: 'fixed', bottom: 28, right: 28, zIndex: 300,
+          width: 52, height: 52, borderRadius: '50%',
+          background: chatOpen ? 'var(--bg-elevated)' : 'var(--accent-cyan)',
+          color: chatOpen ? 'var(--text-secondary)' : '#080c12',
+          border: '1px solid ' + (chatOpen ? 'var(--border-default)' : 'var(--accent-cyan)'),
+          cursor: 'pointer', fontSize: 22,
+          display: 'flex', alignItems: 'center', justifyContent: 'center',
+          boxShadow: 'var(--shadow-glow-cyan)', transition: 'all 0.2s',
+        }}
+      >
+        {chatOpen ? '×' : '◎'}
+      </button>
+
+      {chatOpen && (
+        <ChatBot
+          ticker={stocks[0]?.ticker ?? null}
+          hasAnalysis={stocks.length > 0 && !!data[stocks[0]?.ticker]}
+          onClose={() => setChatOpen(false)}
+          context={stocks.length >= 2
+            ? `Comparing stocks: ${stocks.map(s => s.ticker).join(' vs ')}\n` +
+              stocks.map(s => {
+                const d = data[s.ticker]
+                if (!d) return `${s.ticker}: loading...`
+                return `${s.ticker} (${s.name}): Price ${d.current_price}, Signal ${d.signal} (${d.signal_strength}/100), RSI ${d.indicators?.rsi?.toFixed(1)}, 7D forecast ${d.forecast?.expected_return_pct?.toFixed(2)}%`
+              }).join('\n')
+            : null
+          }
+        />
       )}
     </div>
   )

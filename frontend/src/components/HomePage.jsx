@@ -86,7 +86,7 @@ export default function HomePage({ onSelectTicker, recentlyViewed }) {
         <h1 style={{
           fontFamily: 'var(--font-display)', fontWeight: 800,
           fontSize: 'clamp(28px, 5vw, 52px)', lineHeight: 1.15,
-          background: 'linear-gradient(135deg, #e8edf5 0%, var(--accent-cyan) 50%, var(--accent-indigo) 100%)',
+          background: 'linear-gradient(135deg, var(--text-primary) 0%, var(--accent-cyan) 50%, var(--accent-indigo) 100%)',
           WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent',
           marginBottom: 16,
         }}>
